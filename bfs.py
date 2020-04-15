@@ -22,19 +22,6 @@ pygame.init()
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Breadth-first search (BFS)")
 
-# Initialize grid
-grid = [[0 for col in range(COLS)] for row in range(ROWS)]
-
-# Initialize actions in grid
-actions = {"UP": (-1, 0), "DOWN": (1, 0), "LEFT": (0, -1), "RIGHT": (0, 1)}
-
-# Initialize algorithm
-visited = []
-expanded = []
-is_running = False
-has_start = False
-has_end = False
-
 
 def get_actions(grid, current_node, actions):
     possible_actions = []
@@ -73,23 +60,43 @@ def set_node(grid, node, status):
     return grid
 
 
-def breadth_first_search(grid, frontier, expanded, visited):
-    current_node, path = frontier.pop(0)
-    path.append(current_node)
+def generate_path(best_path, current_node):
+    full_path = []
+    while current_node in best_path.keys():
+        current_node = best_path[current_node]
+        full_path.append(current_node)
+    return full_path[:-1]
+
+
+def breadth_first_search(grid, frontier, expanded, best_path):
+    current_node = frontier.pop(0)
     if (current_node == goal_node):
-        for (x, y) in path[1:-1]:
+        path = generate_path(best_path, current_node)
+        for (x, y) in path:
             grid[x][y] = 'P'
         return False
     expanded.append(current_node)
     grid = set_node(grid, current_node, 'E')
     for next_state in get_actions(grid, current_node, actions):
-        if next_state not in visited:
-            x, y = next_state
+        if next_state not in expanded and next_state not in frontier:
+            best_path[next_state] = current_node
             grid = set_node(grid, next_state, 'V')
-            visited.append(next_state)
-            frontier.append((next_state, path.copy()))
+            frontier.append(next_state)
     return True
 
+
+# Initialize grid
+grid = [[0 for col in range(COLS)] for row in range(ROWS)]
+
+# Initialize actions in grid
+actions = {"UP": (-1, 0), "DOWN": (1, 0), "LEFT": (0, -1), "RIGHT": (0, 1)}
+
+# Initialize algorithm
+expanded = []
+best_path = {}
+is_running = False
+has_start = False
+has_end = False
 
 # Main loop
 run = True
@@ -102,24 +109,36 @@ while run:
             if not has_start:
                 mousex, mousey = pygame.mouse.get_pos()
                 start_node = (mousey // (HEIGHT + MARGIN), mousex // (WIDTH + MARGIN))
-                grid[start_node[0]][start_node[1]] = 'S'
-                frontier = [(start_node, [])]
-                has_start = True
+                if grid[start_node[0]][start_node[1]] != 'G':
+                    grid[start_node[0]][start_node[1]] = 'S'
+                    frontier = [start_node]
+                    has_start = True
             elif not has_end:
                 mousex, mousey = pygame.mouse.get_pos()
                 goal_node = (mousey // (HEIGHT + MARGIN), mousex // (WIDTH + MARGIN))
-                grid[goal_node[0]][goal_node[1]] = 'G'
-                has_end = True
+                if grid[goal_node[0]][goal_node[1]] != 'S':
+                    grid[goal_node[0]][goal_node[1]] = 'G'
+                    has_end = True
             else:
-                mousex, mousey = pygame.mouse.get_pos()
-                barrier_node = (mousey // (HEIGHT + MARGIN), mousex // (WIDTH + MARGIN))
-                grid[barrier_node[0]][barrier_node[1]] = 'X'
+                if not is_running:
+                    mousex, mousey = pygame.mouse.get_pos()
+                    barrier_node = (mousey // (HEIGHT + MARGIN), mousex // (WIDTH + MARGIN))
+                    if grid[barrier_node[0]][barrier_node[1]] == 'X':
+                        grid[barrier_node[0]][barrier_node[1]] = 0
+                    elif grid[barrier_node[0]][barrier_node[1]] == 'S' and has_end:
+                        grid[barrier_node[0]][barrier_node[1]] = 0
+                        has_start = False
+                    elif grid[barrier_node[0]][barrier_node[1]] == 'G' and has_start:
+                        grid[barrier_node[0]][barrier_node[1]] = 0
+                        has_end = False
+                    elif grid[barrier_node[0]][barrier_node[1]] != 'S' and grid[barrier_node[0]][barrier_node[1]] != 'G':
+                        grid[barrier_node[0]][barrier_node[1]] = 'X'
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN and has_start and has_end:
                 is_running = True
     screen.fill(BLACK)
     if is_running:
-        is_running = breadth_first_search(grid, frontier, expanded, visited)
+        is_running = breadth_first_search(grid, frontier, expanded, best_path)
     draw_grid(grid)
     pygame.display.flip()
     clock.tick(10)
