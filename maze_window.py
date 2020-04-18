@@ -1,13 +1,14 @@
 import pygame
 
 class MazeWindow(object):
-	def __init__(self, rows=12, columns=12, width=20, margin=2, title="Maze"):
+	def __init__(self, rows=12, columns=12, width=20, margin=2, cost=1, title="Maze"):
 		# Set window dimensions
 		self.rows = int(rows)
 		self.columns = int(columns)
 		self.width = int(width)
 		self.height = self.width
 		self.margin = int(margin)
+		self.cost = int(cost)
 		self.title = title
 		self.size = ((self.height + self.margin) * self.columns, (self.width + self.margin) * self.rows + self.margin)
 
@@ -76,7 +77,6 @@ class MazeWindow(object):
 		self.size = ((self.height + self.margin) * self.columns, (self.width + self.margin) * self.rows + self.margin)
 
 
-
 	def save(self, name):
 		# Check position of start, goal and blocked nodes
 		start_node = self.check_position(self.state_start)
@@ -113,10 +113,10 @@ class MazeWindow(object):
 			self.cost_grid = self.calculate_cost_grid(None)
 		elif algorithm == "Dijkstra's algorithm":
 			solve_maze = self.dijkstra
-			self.cost_grid = self.calculate_cost_grid("cost_only")
+			self.cost_grid = self.calculate_cost_grid("cost")
 		elif algorithm == "Greedy best-first search (GBFS)":
 			solve_maze = self.greedy_best_first_search
-			self.cost_grid = self.calculate_cost_grid("heuristic_only")
+			self.cost_grid = self.calculate_cost_grid("heuristic")
 		elif algorithm == "A star":
 			solve_maze = self.a_star
 			self.cost_grid = self.calculate_cost_grid("cost+heuristic")
@@ -175,26 +175,12 @@ class MazeWindow(object):
 		start_node = self.check_position(self.state_start)
 		goal_node = self.check_position(self.state_goal)
 		total_cost = []
-		if method == "cost_only":
-			for row in range(self.rows):
-				total_cost.append([])
-				for col in range(self.columns):
-					cost_to_start = abs(start_node[0] - row) + abs(start_node[1] - col)
-					cost_to_goal = abs(goal_node[0] - row) + abs(goal_node[1] - col)
-					total_cost[row].append(cost_to_start)
-		elif method == "heuristic_only":
-			for row in range(self.rows):
-				total_cost.append([])
-				for col in range(self.columns):
-					cost_to_goal = abs(goal_node[0] - row) + abs(goal_node[1] - col)
-					total_cost[row].append(cost_to_goal)
+		if method == "cost":
+			total_cost = [[self.cost for col in range(self.columns)] for row in range(self.rows)]
+		elif method == "heuristic":
+			total_cost = [[abs(goal_node[0] - row) + abs(goal_node[1] - col) for col in range(self.columns)] for row in range(self.rows)]
 		elif method == "cost+heuristic":
-			for row in range(self.rows):
-				total_cost.append([])
-				for col in range(self.columns):
-					cost_to_start = abs(start_node[0] - row) + abs(start_node[1] - col)
-					cost_to_goal = abs(goal_node[0] - row) + abs(goal_node[1] - col)
-					total_cost[row].append(cost_to_start + cost_to_goal)
+			total_cost = [[abs(goal_node[0] - row) + abs(goal_node[1] - col) + self.cost for col in range(self.columns)] for row in range(self.rows)]
 		else:
 			total_cost = [[0 for col in range(self.columns)] for row in range(self.rows)]
 
@@ -219,7 +205,7 @@ class MazeWindow(object):
 		current_node, cost = self.open_nodes.pop(0)
 		if (current_node == self.goal_node):
 			self.generate_path(current_node)
-			for (x, y) in self.full_path:
+			for (x, y) in self.full_path[:-1]:
 				self.grid[x][y] = self.state_path
 			return True
 		self.closed_nodes.append(current_node)
@@ -261,11 +247,10 @@ class MazeWindow(object):
 		self.closed_nodes.append(current_node)
 		self.set_node(current_node, self.state_explored)
 		for next_state in self.get_actions(current_node):
-			cost_node = self.get_cost_node(self.cost_grid, next_state)
-			if (next_state, cost_node) not in self.open_nodes and next_state not in self.closed_nodes:
+			if (next_state, cost+1) not in self.open_nodes and next_state not in self.closed_nodes:
 				self.best_path[next_state] = current_node
 				self.set_node(next_state, self.state_visited)
-				self.open_nodes.append((next_state, cost_node))
+				self.open_nodes.append((next_state, cost+1))
 		self.open_nodes.sort(key=lambda x: x[1])
 		return False
 
