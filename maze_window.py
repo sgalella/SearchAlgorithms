@@ -111,6 +111,9 @@ class MazeWindow(object):
 		if algorithm == "Breadth-first search (BFS)":
 			solve_maze = self.breadth_first_search
 			self.cost_grid = self.calculate_cost_grid(None)
+		elif algorithm == "Depth-first search (DFS)":
+			solve_maze = self.depth_first_search
+			self.cost_grid = self.calculate_cost_grid(None)
 		elif algorithm == "Dijkstra's algorithm":
 			solve_maze = self.dijkstra
 			self.cost_grid = self.calculate_cost_grid("cost")
@@ -222,6 +225,22 @@ class MazeWindow(object):
 
 	def breadth_first_search(self):
 		current_node, cost = self.open_nodes.pop(0)
+		if (current_node == self.goal_node):
+			self.generate_path(current_node)
+			for (x, y) in self.full_path[:-1]:
+				self.grid[x][y] = self.state_path
+			return True
+		self.closed_nodes.append(current_node)
+		self.set_node(current_node, self.state_explored)
+		for next_state in self.get_actions(current_node):
+			if (next_state, 0) not in self.open_nodes and next_state not in self.closed_nodes:
+				self.best_path[next_state] = current_node
+				self.set_node(next_state, self.state_visited)
+				self.open_nodes.append((next_state, 0))
+		return False
+
+	def depth_first_search(self):
+		current_node, cost = self.open_nodes.pop(-1)
 		if (current_node == self.goal_node):
 			self.generate_path(current_node)
 			for (x, y) in self.full_path[:-1]:

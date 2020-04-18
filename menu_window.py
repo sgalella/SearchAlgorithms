@@ -62,7 +62,7 @@ class MenuWindow(tk.Frame):
 		self.bottom_frame.pack(padx=5, pady=5, fill="both", expand="yes")
 
 		# Bottom frame – Combobox
-		self.combobox = ttk.Combobox(self.bottom_frame, width=25, state="readonly",values=["Breadth-first search (BFS)", "Dijkstra's algorithm", "Greedy best-first search (GBFS)", "A star"])
+		self.combobox = ttk.Combobox(self.bottom_frame, width=25, state="readonly",values=["Breadth-first search (BFS)", "Depth-first search (DFS)","Dijkstra's algorithm", "Greedy best-first search (GBFS)", "A star"])
 		self.combobox.current(0)
 		self.combobox.grid(row=0, columnspan=2, padx=(10,0))
 
