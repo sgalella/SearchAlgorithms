@@ -205,7 +205,7 @@ class MazeWindow(object):
 		self.grid = [row.copy() for row in self.grid_backup]
 
 	def a_star(self):
-		current_node, cost = self.open_nodes.pop(0)
+		current_node, _ = self.open_nodes.pop(0)
 		if (current_node == self.goal_node):
 			self.generate_path(current_node)
 			for (x, y) in self.full_path[:-1]:
@@ -214,17 +214,17 @@ class MazeWindow(object):
 		self.closed_nodes.append(current_node)
 		self.set_node(current_node, self.state_explored)
 		for next_state in self.get_actions(current_node):
-			cost_node = self.get_cost_node(self.cost_grid, next_state)
-			if (next_state, cost_node) not in self.open_nodes and next_state not in self.closed_nodes:
+			next_cost = self.get_cost_node(self.cost_grid, next_state)
+			if (next_state, next_cost) not in self.open_nodes and next_state not in self.closed_nodes:
 				self.best_path[next_state] = current_node
 				self.set_node(next_state, self.state_visited)
-				self.open_nodes.append((next_state, cost_node))
+				self.open_nodes.append((next_state, next_cost))
 		self.open_nodes.sort(key=lambda x: x[1])
 		return False
 
 
 	def breadth_first_search(self):
-		current_node, cost = self.open_nodes.pop(0)
+		current_node, _ = self.open_nodes.pop(0)
 		if (current_node == self.goal_node):
 			self.generate_path(current_node)
 			for (x, y) in self.full_path[:-1]:
@@ -240,7 +240,7 @@ class MazeWindow(object):
 		return False
 
 	def depth_first_search(self):
-		current_node, cost = self.open_nodes.pop(-1)
+		current_node, _ = self.open_nodes.pop(-1)
 		if (current_node == self.goal_node):
 			self.generate_path(current_node)
 			for (x, y) in self.full_path[:-1]:
@@ -257,7 +257,7 @@ class MazeWindow(object):
 
 
 	def dijkstra(self):
-		current_node, cost = self.open_nodes.pop(0)
+		current_node, _ = self.open_nodes.pop(0)
 		if (current_node == self.goal_node):
 			self.generate_path(current_node)
 			for (x, y) in self.full_path[:-1]:
@@ -266,16 +266,17 @@ class MazeWindow(object):
 		self.closed_nodes.append(current_node)
 		self.set_node(current_node, self.state_explored)
 		for next_state in self.get_actions(current_node):
-			if (next_state, cost+1) not in self.open_nodes and next_state not in self.closed_nodes:
+			next_cost = self.get_cost_node(self.cost_grid, next_state)
+			if (next_state, next_cost) not in self.open_nodes and next_state not in self.closed_nodes:
 				self.best_path[next_state] = current_node
 				self.set_node(next_state, self.state_visited)
-				self.open_nodes.append((next_state, cost+1))
+				self.open_nodes.append((next_state, next_cost))
 		self.open_nodes.sort(key=lambda x: x[1])
 		return False
 
 
 	def greedy_best_first_search(self):
-		current_node, cost = self.open_nodes.pop(0)
+		current_node, _ = self.open_nodes.pop(0)
 		if (current_node == self.goal_node):
 			self.generate_path(current_node)
 			for (x, y) in self.full_path[:-1]:
@@ -284,11 +285,11 @@ class MazeWindow(object):
 		self.closed_nodes.append(current_node)
 		self.set_node(current_node, self.state_explored)
 		for next_state in self.get_actions(current_node):
-			cost_node = self.get_cost_node(self.cost_grid, next_state)
-			if (next_state, cost_node) not in self.open_nodes and next_state not in self.closed_nodes:
+			next_cost = self.get_cost_node(self.cost_grid, next_state)
+			if (next_state, next_cost) not in self.open_nodes and next_state not in self.closed_nodes:
 				self.best_path[next_state] = current_node
 				self.set_node(next_state, self.state_visited)
-				self.open_nodes.append((next_state, cost_node))
+				self.open_nodes.append((next_state, next_cost))
 		self.open_nodes.sort(key=lambda x: x[1])
 		return False
 
