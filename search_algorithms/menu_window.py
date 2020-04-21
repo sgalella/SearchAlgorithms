@@ -2,7 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.filedialog
 from tkinter import messagebox
-from maze_window import MazeWindow
+from .maze_window import MazeWindow
 
 
 class MenuWindow(tk.Frame):
@@ -115,10 +115,3 @@ class MenuWindow(tk.Frame):
 		else:
 			messagebox.showerror("File error", "There is no maze available! Please, create first a maze.", parent=self)
 
-
-if __name__ == "__main__":
-	root = tk.Tk()
-	p = tk.PhotoImage(file="images/icon.png")
-	root.iconphoto(False, p)
-	MenuWindow(root).pack()
-	root.mainloop()
