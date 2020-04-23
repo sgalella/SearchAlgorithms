@@ -8,4 +8,16 @@ Click first the starting point, and then, the goal point. Draw additional obstac
 </p>
 
 
+## Installation
 
+To install the dependencies, run the following command:
+
+```bash
+pip install -r requirements.txt
+```
+
+Then use the following command to run SearchAlgorithms.
+
+```bash
+python run.py
+```
