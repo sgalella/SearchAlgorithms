@@ -1,5 +1,5 @@
 import tkinter as tk
-from search_algorithms.menu_window import MenuWindow
+from pathfinding_algorithms.menu_window import MenuWindow
 
 
 root = tk.Tk()
