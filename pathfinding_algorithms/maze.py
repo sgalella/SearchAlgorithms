@@ -1,7 +1,7 @@
 import pygame
 
 
-class MazeWindow(object):
+class MazeWindow:
     def __init__(self, rows=12, columns=12, width=20, margin=2, cost=1, title="Maze"):
         # Set window dimensions
         self.rows = int(rows)

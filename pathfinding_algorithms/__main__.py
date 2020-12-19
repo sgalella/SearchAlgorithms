@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from .menu_window import MenuWindow
+from .menu import MenuWindow
 
 
 root = tk.Tk()
