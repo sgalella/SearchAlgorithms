@@ -2,7 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.filedialog
 from tkinter import messagebox
-from .maze_window import MazeWindow
+from .maze import MazeWindow
 
 
 class MenuWindow(tk.Frame):
