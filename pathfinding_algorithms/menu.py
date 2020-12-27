@@ -6,7 +6,14 @@ from .maze import MazeWindow
 
 
 class MenuWindow(tk.Frame):
+    """ Main menu. """
     def __init__(self, parent, *args, **kwargs):
+        """
+        Initializes the main menu.
+
+        Args:
+            parent (tkinter.Tk): Tkinter parent window.
+        """
         # Set window configuration
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
@@ -86,6 +93,7 @@ class MenuWindow(tk.Frame):
         self.maze = None
 
     def load_maze(self):
+        """ Loads maze from file. Default location at ./mazes. """
         try:
             if not self.maze:
                 self.maze = MazeWindow(rows=self.rows_entry.get(),
@@ -99,6 +107,7 @@ class MenuWindow(tk.Frame):
             messagebox.showerror("File error", "File could not be loaded!", parent=self)
 
     def edit_maze(self):
+        """ Edits maze. If no maze has been loaded, it creates one. """
         if not self.maze:
             # Initialize maze
             self.maze = MazeWindow(rows=self.rows_entry.get(),
@@ -110,6 +119,7 @@ class MenuWindow(tk.Frame):
         self.maze.edit()
 
     def save_maze(self):
+        """ Saves maze to file. """
         try:
             self.parent.filename = tkinter.filedialog.asksaveasfilename(initialdir=".", title="Save maze", filetypes=(("txt files", "*.txt"),))
             self.maze.save(self.parent.filename)

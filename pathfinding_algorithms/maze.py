@@ -2,7 +2,19 @@ import pygame
 
 
 class MazeWindow:
+    """ Visualization of maze pathfinder. """
     def __init__(self, rows=12, columns=12, width=20, margin=2, cost=1, title="Maze"):
+        """
+        Initializes maze visualization.
+
+        Args:
+            rows (int, optional): Number of rows of the maze. Defaults to 12.
+            columns (int, optional): Number of columns of the maze. Defaults to 12.
+            width (int, optional): Width size of each cell. Defaults to 20.
+            margin (int, optional): Margin size of each cell. Defaults to 2.
+            cost (int, optional): Cost of moving from one cell to another adjacent. Defaults to 1.
+            title (str, optional): Title of the Pygame window. Defaults to "Maze".
+        """
         # Set window dimensions
         self.rows = int(rows)
         self.columns = int(columns)
@@ -38,6 +50,7 @@ class MazeWindow:
         pygame.display.set_icon(self.icon)
 
     def draw_grid(self):
+        """ Draws maze grid. """
         for row in range(self.rows):
             for col in range(self.columns):
                 if self.grid[row][col] == self.state_start:
@@ -56,6 +69,7 @@ class MazeWindow:
                     pygame.draw.rect(self.screen, self.color_default, ((self.width + self.margin) * col + self.margin, (self.height + self.margin) * row + self.margin, self.width, self.height))
 
     def check_position(self, state):
+        """ Checks locations where state occurs. """
         position = []
         for row in range(self.rows):
             for col in range(self.columns):
@@ -66,6 +80,7 @@ class MazeWindow:
         return position
 
     def load(self, name):
+        """ Loads grid from file. """
         with open(name, 'r') as file:
             self.grid = [line.strip().split(',') for line in file]
 
@@ -75,6 +90,7 @@ class MazeWindow:
         self.size = ((self.height + self.margin) * self.columns, (self.width + self.margin) * self.rows + self.margin)
 
     def save(self, name):
+        """ Saves maze as text file with filename name. """
         # Check position of start, goal and blocked nodes
         start_node = self.check_position(self.state_start)
         goal_node = self.check_position(self.state_goal)
@@ -98,6 +114,13 @@ class MazeWindow:
                 file.write("\n")
 
     def run(self, is_expansion, algorithm):
+        """
+        Runs the pathfinder algorithm.
+
+        Args:
+            is_expansion (bool): Node expansion is visible or not.
+            algorithm ([type]): Algorithm to solve the maze.
+        """
         # Initialize pygame
         pygame.init()
         self.screen = pygame.display.set_mode(self.size)
@@ -161,16 +184,19 @@ class MazeWindow:
         self.clear_maze()
 
     def set_node(self, node, state):
+        """ Sets node to be at a given state. """
         if self.grid[node[0]][node[1]] != self.state_start and self.grid[node[0]][node[1]] != self.state_goal:
             self.grid[node[0]][node[1]] = state
 
     def generate_path(self, current_node):
+        """ Generates optimal path from goal to beginning. """
         self.full_path = []
         while current_node in self.best_path.keys():
             current_node = self.best_path[current_node]
             self.full_path.append(current_node)
 
     def calculate_cost_grid(self, method):
+        """ Calculates cost at position using a given method. """
         goal_node = self.check_position(self.state_goal)
         total_cost = []
         if method == "cost":
@@ -185,9 +211,11 @@ class MazeWindow:
         return total_cost
 
     def get_cost_node(self, cost_grid, node):
+        """ Gets cost of a given node. """
         return cost_grid[node[0]][node[1]]
 
     def get_actions(self, current_node):
+        """ Gets available actions of a given node. """
         possible_actions = []
         for action in self.actions.values():
             new_x = current_node[0] + action[0]
@@ -197,9 +225,11 @@ class MazeWindow:
         return possible_actions
 
     def clear_maze(self):
+        """ Resets maze grid. """
         self.grid = [row.copy() for row in self.grid_backup]
 
     def a_star(self):
+        """ Runs the A* algorithm. """  # TODO: Move algorithms to module algorithms.py
         current_node, _ = self.open_nodes.pop(0)
         if (current_node == self.goal_node):
             self.generate_path(current_node)
@@ -218,6 +248,7 @@ class MazeWindow:
         return False
 
     def breadth_first_search(self):
+        """ Runs the BFS algorithm. """
         current_node, _ = self.open_nodes.pop(0)
         if (current_node == self.goal_node):
             self.generate_path(current_node)
@@ -234,6 +265,7 @@ class MazeWindow:
         return False
 
     def depth_first_search(self):
+        """ Runs the DFS algorithm. """ 
         current_node, _ = self.open_nodes.pop(-1)
         if (current_node == self.goal_node):
             self.generate_path(current_node)
@@ -250,6 +282,7 @@ class MazeWindow:
         return False
 
     def dijkstra(self):
+        """ Runs the Dijkstra algorithm. """
         current_node, _ = self.open_nodes.pop(0)
         if (current_node == self.goal_node):
             self.generate_path(current_node)
@@ -268,6 +301,7 @@ class MazeWindow:
         return False
 
     def greedy_best_first_search(self):
+        """ Runs the GBFS algorithm. """
         current_node, _ = self.open_nodes.pop(0)
         if (current_node == self.goal_node):
             self.generate_path(current_node)
@@ -286,6 +320,7 @@ class MazeWindow:
         return False
 
     def edit(self):
+        """ Edits the maze. """
         # Initialize pygame
         pygame.init()
         self.screen = pygame.display.set_mode(self.size)
